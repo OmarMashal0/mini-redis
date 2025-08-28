@@ -16,6 +16,8 @@ private:
 
 	size_t hash_function(const std::string& key) const;
 
+	void rehash(size_t new_bucket_count);
+
 public:
 	explicit HashTable(size_t initial_bucket_count = kDefaultBucketCount);
 

@@ -23,6 +23,12 @@ void HashTable::insert(const std::string& key, const std::string& value) {
     }
     buckets_[index].push_back({ key, value });  // insert new
     element_count_++; // increament only when adding new pair
+
+    // If load factor is too high, resize
+    if (load_factor() > 0.75) {
+        rehash(bucket_count_ * 2);
+    }
+
 }
 
 std::string HashTable::retrieve(const std::string& key) const {
@@ -47,3 +53,28 @@ double HashTable::load_factor() const {
     // --> load factor = usage / capacity
     return static_cast<double>(element_count_) / bucket_count_;
 }
+
+void HashTable::rehash(size_t new_bucket_count) {
+    // 1. Create new empty buckets
+    std::vector<std::list<std::pair<std::string, std::string>>> new_buckets(new_bucket_count);
+
+    // 2. Rehash all existing key-value pairs
+    for (const auto& bucket : buckets_) {
+        for (const auto& kv : bucket) {
+            // Recompute index using new bucket count
+            unsigned long hash = 5381;
+            for (char c : kv.first) {
+                hash = ((hash << 5) + hash) + c;  // djb2
+            }
+            size_t new_index = hash % new_bucket_count;
+
+            // Insert into new bucket
+            new_buckets[new_index].push_back(kv);
+        }
+    }
+
+    // 3. Replace old buckets with new buckets
+    buckets_ = std::move(new_buckets);
+    bucket_count_ = new_bucket_count;
+}
+
