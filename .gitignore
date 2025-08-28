@@ -1,0 +1,11 @@
+# Ignore Visual Studio & JetBrains IDE files
+.vs/
+.idea/
+
+# Ignore build artifacts
+*.o
+*.obj
+*.exe
+*.out
+*.log
+build/
