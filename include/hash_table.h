@@ -26,6 +26,9 @@ public:
 	void remove(const std::string& key);
 
 	double load_factor() const;
+	size_t bucket_count() const { return bucket_count_; }
+
+
 };
 
 #endif  // MINIREDIS_INCLUDE_HASH_TABLE_H_

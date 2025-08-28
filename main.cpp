@@ -6,12 +6,12 @@ int main() {
 
     for (int i = 1; i <= 50; i++) {
         db.insert("key" + std::to_string(i), "val" + std::to_string(i));
+
         std::cout << "Inserted key" << i
             << " | Load factor = " << db.load_factor()
-            << " | Buckets = " << i << std::endl;
+            << " | Buckets = " << db.bucket_count()
+            << std::endl;
     }
 
-
-
-	return 0;
+    return 0;
 }

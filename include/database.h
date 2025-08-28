@@ -14,6 +14,8 @@ public:
 	void remove(const std::string& key);
 
 	double load_factor() const;
+	size_t bucket_count() const { return store_.bucket_count(); }
+
 };
 
 #endif  // MINIREDIS_INCLUDE_DATABASE_H_
