@@ -2,33 +2,35 @@
 #include "database.h"
 
 int main() {
-    Database db;
+    Database db(2); // cache size = 2
 
-    // Insert some keys
+    // Insert keys
     db.insert("user:1", "Alice");
     db.insert("user:2", "Bob");
-    db.insert("order:1", "Laptop");
 
-    // Retrieve single key
+    // Retrieve (loads into cache)
     std::cout << "GET user:1 -> " << db.retrieve("user:1") << std::endl;
+    std::cout << "GET user:2 -> " << db.retrieve("user:2") << std::endl;
 
-    // Prefix search before removal
-    std::cout << "Prefix search 'user:' before removal -> ";
-    auto results1 = db.keys_with_prefix("user:");
-    for (auto& key : results1) {
-        std::cout << key << " ";
-    }
+    // Insert new key -> cache full, will evict least recently used
+    db.insert("user:3", "Charlie");
+
+    // Test cache behavior
+    std::cout << "GET user:3 -> " << db.retrieve("user:3") << std::endl;
+    std::cout << "GET user:1 -> " << db.retrieve("user:1") << std::endl;
+    std::cout << "GET user:2 -> " << db.retrieve("user:2") << std::endl; // might be evicted
+
+    // Prefix search test
+    std::cout << "Keys with prefix 'user:' -> ";
+    auto results = db.keys_with_prefix("user:");
+    for (auto& key : results) std::cout << key << " ";
     std::cout << std::endl;
 
-    // Remove one key
+    // Removal test
     db.remove("user:1");
-
-    // Prefix search after removal
-    std::cout << "Prefix search 'user:' after removal -> ";
+    std::cout << "Keys with prefix 'user:' after removing user:1 -> ";
     auto results2 = db.keys_with_prefix("user:");
-    for (auto& key : results2) {
-        std::cout << key << " ";
-    }
+    for (auto& key : results2) std::cout << key << " ";
     std::cout << std::endl;
 
     return 0;
