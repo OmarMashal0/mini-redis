@@ -1,0 +1,15 @@
+# Build artifacts
+*.o
+*.exe
+mini_redis
+mini_redis.exe
+
+# Log files
+db.log
+
+# IDE files
+.vs/
+.idea/
+
+# Temporary files
+*~
