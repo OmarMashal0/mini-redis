@@ -6,6 +6,7 @@ HashTable::HashTable(size_t initialBucketCount)
 }
 
 size_t HashTable::hashFunction(const std::string& key) const {
+    // djb2 hash algorithm
     unsigned long hash = 5381;
     for (char c : key) {
         hash = ((hash << 5) + hash) + c;
@@ -15,6 +16,7 @@ size_t HashTable::hashFunction(const std::string& key) const {
 
 void HashTable::insert(const std::string& key, const std::string& value) {
     size_t index = hashFunction(key);
+    // check if key already exists and update value
     for (auto& kv : buckets_[index]) {
         if (kv.first == key) {
             kv.second = value;
@@ -24,6 +26,7 @@ void HashTable::insert(const std::string& key, const std::string& value) {
     buckets_[index].push_back({key, value});
     element_count_++;
 
+    // rehash when load factor exceeds 75% to maintain performance
     if (loadFactor() > 0.75) {
         rehash(bucket_count_ * 2);
     }
@@ -54,6 +57,7 @@ double HashTable::loadFactor() const {
 void HashTable::rehash(size_t newBucketCount) {
     std::vector<std::list<std::pair<std::string, std::string>>> newBuckets(newBucketCount);
 
+    // redistribute all existing key-value pairs to new buckets
     for (const auto& bucket : buckets_) {
         for (const auto& kv : bucket) {
             unsigned long hash = 5381;

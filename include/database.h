@@ -11,11 +11,11 @@
 
 class Database {
 private:
-    HashTable store_;
-    Trie trie_;
-    LRUCache cache_;
-    std::map<std::string, bool> rb_tree_;
-    std::ofstream log_file_;
+    HashTable store_; // main key-value storage
+    Trie trie_; // for prefix searches
+    LRUCache cache_; // hot data cache
+    std::map<std::string, bool> rb_tree_; // ordered keys for range queries
+    std::ofstream log_file_; // persistence and recovery
 
 public:
     explicit Database(size_t cacheCapacity = 5);

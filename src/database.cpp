@@ -23,6 +23,7 @@ void Database::insert(const std::string& key, const std::string& value) {
     cache_.put(key, value);
     rb_tree_[key] = true;
     
+    // log operation for persistence and recovery
     if (log_file_.is_open()) {
         auto now = std::chrono::system_clock::now();
         auto time_t = std::chrono::system_clock::to_time_t(now);
@@ -34,6 +35,7 @@ void Database::insert(const std::string& key, const std::string& value) {
 }
 
 std::string Database::retrieve(const std::string& key) {
+    // check cache first for hot data
     std::string cached = cache_.get(key);
     if (!cached.empty()) return cached;
 
@@ -48,6 +50,7 @@ void Database::remove(const std::string& key) {
     rb_tree_.erase(key);
     cache_.erase(key);
     
+    // log deletion for consistency
     if (log_file_.is_open()) {
         auto now = std::chrono::system_clock::now();
         auto time_t = std::chrono::system_clock::to_time_t(now);
@@ -63,6 +66,7 @@ std::vector<std::string> Database::keysWithPrefix(const std::string& prefix) {
 }
 
 std::vector<std::string> Database::rangeQuery(const std::string& start, const std::string& end) {
+    // use rb_tree for efficient range queries on sorted keys
     std::vector<std::string> result;
     for (auto it = rb_tree_.lower_bound(start); it != rb_tree_.end() && it->first <= end; ++it) {
         result.push_back(it->first);
@@ -76,6 +80,7 @@ bool Database::exists(const std::string& key) const {
 
 std::vector<std::string> Database::keys(const std::string& pattern) {
     if (pattern == "*") {
+        // return all keys from rb_tree for consistent ordering
         std::vector<std::string> all_keys;
         for (const auto& pair : rb_tree_) {
             all_keys.push_back(pair.first);
@@ -84,6 +89,7 @@ std::vector<std::string> Database::keys(const std::string& pattern) {
     }
     
     if (pattern.length() > 1 && pattern.back() == '*') {
+        // wildcard pattern - use trie for prefix matching
         std::string prefix = pattern.substr(0, pattern.length() - 1);
         return keysWithPrefix(prefix);
     }
@@ -96,11 +102,13 @@ std::vector<std::string> Database::keys(const std::string& pattern) {
 }
 
 void Database::flushAll() {
+    // reset all data structures to initial state
     store_ = HashTable();
     trie_ = Trie();
     cache_ = LRUCache(cache_.capacity());
     rb_tree_.clear();
     
+    // clear log file and start fresh
     log_file_.close();
     log_file_.open("db.log", std::ios::trunc);
 }
@@ -127,6 +135,7 @@ void Database::replayLog() {
             value = value.substr(1);
         }
         
+        // replay logged operations to restore state
         if (operation == "SET" && !value.empty()) {
             store_.insert(key, value);
             trie_.insert(key);

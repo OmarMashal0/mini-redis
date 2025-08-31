@@ -18,8 +18,8 @@ class LRUCache {
 private:
     size_t capacity_;
     std::unordered_map<std::string, LRUNode*> map_;
-    LRUNode* head; // dummy head node
-    LRUNode* tail; // dummy tail node
+    LRUNode* head; // dummy head node for easier list manipulation
+    LRUNode* tail; // dummy tail node for easier list manipulation
 
     void moveToFront(LRUNode* node);
     void removeNode(LRUNode* node);

@@ -7,8 +7,8 @@
 
 class TrieNode {
 public:
-    bool isEnd;
-    std::unordered_map<char, TrieNode*> children;
+    bool isEnd; // marks end of a complete key
+    std::unordered_map<char, TrieNode*> children; // character to child node mapping
 
     TrieNode() : isEnd(false) {}
 };

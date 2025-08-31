@@ -8,6 +8,7 @@
 class HashTable {
 private:
     static const size_t kDefaultBucketCount = 16;
+    // separate chaining with linked lists to handle collisions
     std::vector<std::list<std::pair<std::string, std::string>>> buckets_;
     size_t bucket_count_;
     size_t element_count_;
